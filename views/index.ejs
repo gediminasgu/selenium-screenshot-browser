@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" ng-app>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel='stylesheet' href='/css/style.css' />
+    <script src="/lib/angular/angular.min.js"></script>
+    <script src="/js/ctrls/screenshot.js"></script>
+    
+    <title>Selenium screenshot browser</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="/lib/html5shiv.js"></script>
+      <script src="/lib/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Selenium screenshot browser</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Screenshots</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container theme-showcase" ng-controller="ScreenshotCtrl" ng-init="init()">
+    
+    	<div ng-show="hasFolders()">
+    		<h1>Folders</h1>
+    		<ul ng-repeat="dir in dirs">
+    			<li><a href="#{{getPath(dir.path)}}" ng-click="gotoDir(dir.path)">{{ dir.name }}</a></li>
+    		</ul>
+    	</div>
+    
+    	<table>
+    		<tr ng-repeat="(suiteName, suite) in suites">
+    			<td>
+				      <div class="page-header">
+				        <h1>{{ suiteName }}</h1>
+				      </div>
+    				<table class="test table">
+    					<tbody ng-repeat="(testName, test) in suite.tests">
+    						<tr>
+    							<th><a ng-click="toggleItem(test)"><h2>{{ testName }}</h2></a></th>
+    						</tr>
+    						<tr ng-repeat="(screenshotName, screenshot) in test.screenshots" ng-show="showItem(test)">
+    							<td class="screenshots">
+    								<a ng-click="toggleItem(screenshot)"><h3>{{ screenshotName }}</h3></a><br/>
+    								<div ng-show="showItem(screenshot)">
+	    								<a ng-href="{{screenshot.old.file}}"><img ng-src="{{screenshot.old.file}}" /></a>
+	    								<a ng-href="{{screenshot.new.file}}"><img ng-src="{{screenshot.new.file}}" /></a>
+	    								<a ng-href="{{screenshot.diff.file}}"><img ng-src="{{screenshot.diff.file}}" /></a>
+    								</div>
+    							</td>
+    						</tr>
+    					</tbody>
+    				</table>
+    			</td>
+    		</tr>
+    	</table>
+    </div>
+  </body>
+</html>
