@@ -2,8 +2,8 @@ var fs = require("fs");
 var path = require("path");
 var url = require('url');
 
-var regexWithScreenshotName = /^(\w+)\_\_(\w+)\_\_(\w+)_(new|old|diff)\.png$/;
-var regexWoScreenshotName = /^(\w+)\_\_(\w+)_(new|old|diff)\.png$/;
+var regexWithScreenshotName = /^(\w+)\_\_(\w+)\_\_(\w+)_(new|old|diff|bak)\.png$/;
+var regexWoScreenshotName = /^(\w+)\_\_(\w+)_(new|old|diff|bak)\.png$/;
 
 /*
  * GET users listing.
@@ -17,7 +17,7 @@ exports.list = function(req, res){
 	if (!p)
 		p = "/";
 	
-	var dir = "/Users/karolinaguobiene/Documents/gedas/workspace/selenium-screenshot-browser/public/screenshots" + p;
+	var dir = "./public/screenshots" + p;
 	fs.readdir(dir, function(arg1, files, arg2, arg3){
 		var list = {
 				path: p,

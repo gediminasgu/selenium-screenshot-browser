@@ -64,11 +64,12 @@
     							<th><a ng-click="toggleItem(test)"><h2>{{ testName }}</h2></a></th>
     						</tr>
     						<tr ng-repeat="(screenshotName, screenshot) in test.screenshots" ng-show="showItem(test)">
-    							<td class="screenshots">
-    								<a ng-click="toggleItem(screenshot)"><h3>{{ screenshotName }}</h3></a><br/>
+    							<td class="screenshots" ng-class="getFailedTest(screenshot)">
+    								<a ng-click="toggleItem(screenshot)"><h3 style="display: inline">{{ screenshotName }}</h3></a> <span ng-show="screenshot.bak"><b>[TEST FAILED]</b></span><br/>
     								<div ng-show="showItem(screenshot)">
 	    								<a ng-href="{{screenshot.old.file}}"><img ng-src="{{screenshot.old.file}}" /></a>
-	    								<a ng-href="{{screenshot.new.file}}"><img ng-src="{{screenshot.new.file}}" /></a>
+	    								<a ng-href="{{screenshot.new.file}}" ng-show="screenshot.new"><img ng-src="{{screenshot.new.file}}" /></a>
+	    								<a ng-href="{{screenshot.bak.file}}" ng-show="screenshot.bak"><img ng-src="{{screenshot.bak.file}}" /></a>
 	    								<a ng-href="{{screenshot.diff.file}}"><img ng-src="{{screenshot.diff.file}}" /></a>
     								</div>
     							</td>

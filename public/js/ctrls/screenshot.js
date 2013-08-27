@@ -43,4 +43,8 @@ function ScreenshotCtrl($scope, $http, $location) {
 		  $scope.path += '/';
 	  return $scope.path + dirName;
   };
+  
+  $scope.getFailedTest = function(screenshot) {
+	return screenshot.bak ? "alert-danger" : "";
+  };
 };
