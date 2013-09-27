@@ -7,8 +7,12 @@ a {
   color: #00B7FF;
 }
 
-.screenshots img {
-	width: 33%;
+td.screenshots {
+	text-align: center;
+}
+
+td.screenshots img {
+	width: 100%;
 	vertical-align: top;
 }
 

@@ -2,8 +2,8 @@ var fs = require("fs");
 var path = require("path");
 var url = require('url');
 
-var regexWithScreenshotName = /^(\w+)\_\_(\w+)\_\_(\w+)_(new|old|diff|bak)\.png$/;
-var regexWoScreenshotName = /^(\w+)\_\_(\w+)_(new|old|diff|bak)\.png$/;
+var regexWithScreenshotName = /^([^\s]+)\_\_([^\s]+)\_\_([^\s]+)_(new|old|diff|bak)\.png$/;
+var regexWoScreenshotName = /^([^\s]+)\_\_([^\s]+)_(new|old|diff|bak)\.png$/;
 
 /*
  * GET users listing.
@@ -19,26 +19,38 @@ exports.list = function(req, res){
 	
 	var dir = "./public/screenshots" + p;
 	fs.readdir(dir, function(arg1, files, arg2, arg3){
+
 		var list = {
 				path: p,
 				suites: {},
 				dirs: []
 		};
-		for (var a=0; a<files.length; a++) {
-			var file = files[a];
+
+		files.sort(function(a, b) {
+			var aTime = getCtime(dir, a);
+			var bTime = getCtime(dir, b);
+	        return aTime < bTime ? -1 : 1;
+	    }).forEach(function(file, key) {
 			var fullPath = path.join(dir, file);
-			if (fs.statSync(fullPath).isFile()) {
-				processFile(list, file, p);
+			var fileInfo = fs.statSync(fullPath);
+			if (fileInfo.isFile()) {
+				processFile(list, file, fileInfo.ctime, p);
 			}
 			else {
 				processDir(list, file);
 			}
-		}
+	        // stuff
+	    });
 		res.send(list);
 	});
 };
 
-function processFile(list, file, path) {
+function getCtime(dir, file) {
+	var fullPath = path.join(dir, file);
+	return fs.statSync(fullPath).ctime;
+}
+
+function processFile(list, file, ctime, path) {
 	var result = file.match(regexWithScreenshotName);
 	var suiteName = null, testName, screenshotName = 'teardown', type;
 	if (result){
@@ -62,12 +74,12 @@ function processFile(list, file, path) {
 	file = '/screenshots' + path + file;
 	console.log(file);
 	if (suiteName){
-		addScreenshot(list, suiteName, testName, screenshotName, type, file);
+		addScreenshot(list, suiteName, testName, screenshotName, type, file, ctime);
 	}	
 }
 
-function addScreenshot(list, suiteName, testName, screenshotName, type, file){
-	console.log('Suite: ' + suiteName + "; Test: " + testName + "; Screenshot: " + screenshotName + "; Type: " + type);				
+function addScreenshot(list, suiteName, testName, screenshotName, type, file, ctime){
+	console.log('Suite: ' + suiteName + "; Test: " + testName + "; Screenshot: " + screenshotName + "; Type: " + type + "; ctime: " + ctime);				
 
 	if (typeof(list.suites[suiteName]) == 'undefined'){
 		list.suites[suiteName] = {
@@ -78,18 +90,28 @@ function addScreenshot(list, suiteName, testName, screenshotName, type, file){
 	
 	if (typeof(suite.tests[testName]) == 'undefined'){
 		suite.tests[testName] = {
-				screenshots: {}
+				screenshots: []
 		};
 	}
 	var test = suite.tests[testName];
 	
-	if (typeof(test.screenshots[screenshotName]) == 'undefined'){
-		test.screenshots[screenshotName] = {};
+	var screenshot = null;
+	for (var a=0; a<test.screenshots.length; a++) {
+		if (screenshotName == test.screenshots[a].name)
+		{
+			screenshot = test.screenshots[a];
+			break;
+		}
 	}
-	var screenshot = test.screenshots[screenshotName];
+	
+	if (screenshot == null) {
+		screenshot = {name: screenshotName};
+		test.screenshots.push(screenshot);
+	}
 	
 	screenshot[type] = {
-			file: file
+			file: file,
+			ctime: ctime
 	};
 }
 
